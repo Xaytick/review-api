@@ -72,6 +72,21 @@ service Review {
 			body:"*"
 		};
 	};
+
+	// 根据商家ID获取评论列表（分页）
+	rpc ListReviewByStoreID (ListReviewByStoreIDRequest) returns (ListReviewByStoreIDReply) {}
+
+}
+// 根据商家ID获取评论列表（分页）请求
+message ListReviewByStoreIDRequest {
+	int64 storeID = 1 [(validate.rules).int64 = {gt: 0}];
+	int32 page = 2 [(validate.rules).int32 = {gt: 0}];
+	int32 size = 3 [(validate.rules).int32 = {gt: 0}];
+}
+
+// 根据商家ID获取评论列表（分页）回复
+message ListReviewByStoreIDReply {
+	repeated ReviewInfo list = 1;
 }
 
 // 评论信息
