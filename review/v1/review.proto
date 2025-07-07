@@ -74,8 +74,18 @@ service Review {
 	};
 
 	// 根据商家ID获取评论列表（分页）
-	rpc ListReviewByStoreID (ListReviewByStoreIDRequest) returns (ListReviewByStoreIDReply) {}
+	rpc ListReviewByStoreID (ListReviewByStoreIDRequest) returns (ListReviewByStoreIDReply) {
+		option (google.api.http) = {
+			get:"/v1/review/store/{storeID}"
+		};
+	}
 
+	// 根据用户ID获取评论列表（分页）
+	rpc ListReviewByUserID (ListReviewByUserIDRequest) returns (ListReviewByUserIDReply) {
+		option (google.api.http) = {
+			get:"/v1/review/user/{userID}"
+		};
+	}
 }
 // 根据商家ID获取评论列表（分页）请求
 message ListReviewByStoreIDRequest {
@@ -86,6 +96,18 @@ message ListReviewByStoreIDRequest {
 
 // 根据商家ID获取评论列表（分页）回复
 message ListReviewByStoreIDReply {
+	repeated ReviewInfo list = 1;
+}
+
+// 根据用户ID获取评论列表（分页）请求
+message ListReviewByUserIDRequest {
+	int64 userID = 1 [(validate.rules).int64 = {gt: 0}];
+	int32 page = 2 [(validate.rules).int32 = {gt: 0}];
+	int32 size = 3 [(validate.rules).int32 = {gt: 0}];
+}
+
+// 根据用户ID获取评论列表（分页）回复
+message ListReviewByUserIDReply {
 	repeated ReviewInfo list = 1;
 }
 
