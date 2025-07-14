@@ -158,9 +158,9 @@ message GetReviewReply {
 // 审核评论请求
 message AuditReviewRequest {
 	int64 reviewID = 1 [(validate.rules).int64 = {gt: 0}];
-	int32 status = 2 [(validate.rules).int32 = {gt: 0}];
-	string opUser = 3 [(validate.rules).string = {min_len:2}];
-	string opReason = 4 [(validate.rules).string = {min_len:2}];
+	int32 status = 2;
+	string opUser = 3;
+	string opReason = 4;
 	optional string opRemarks = 5;
 }
 
