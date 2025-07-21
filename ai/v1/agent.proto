@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package api.ai.v1;
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "review/api/ai/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.ai.v1";
+
+// AI Agent 服务
+service AIAgent {
+    // 与 AI 聊天
+    rpc Chat (ChatRequest) returns (ChatReply) {
+        option (google.api.http) = {
+            post: "/ai/v1/chat"
+            body: "*"
+        };
+    }
+}
+
+// 聊天请求
+message ChatRequest {
+    string prompt = 1 [(validate.rules).string = {min_len:1}];
+    repeated string context = 2; // 对话上下文
+}
+
+// 聊天回复
+message ChatReply {
+    string response = 1;
+} 
