@@ -1,0 +1,132 @@
+syntax = "proto3";
+
+package api.user.v1;
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "review/api/user/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.user.v1";
+
+// 定义用户服务
+service User {
+    // 用户注册
+    rpc Register (RegisterRequest) returns (RegisterReply) {
+        option (google.api.http) = {
+            post: "/v1/user/register",
+            body: "*"
+        };
+    }
+
+    // 用户登录
+    rpc Login (LoginRequest) returns (LoginReply) {
+        option (google.api.http) = {
+            post: "/v1/user/login",
+            body: "*"
+        };
+    }
+
+    // 获取用户信息
+    rpc GetUserInfo (GetUserInfoRequest) returns (GetUserInfoReply) {
+        option (google.api.http) = {
+            get: "/v1/user/{userID}" // 优化：使用路径参数
+        };
+    }
+
+    // 更新用户信息
+    rpc UpdateUserInfo (UpdateUserInfoRequest) returns (UpdateUserInfoReply) {
+        option (google.api.http) = {
+            put: "/v1/user/{userID}", // 优化：使用路径参数
+            body: "*"
+        };
+    }
+
+    // 删除用户
+    rpc DeleteUser (DeleteUserRequest) returns (DeleteUserReply) {
+        option (google.api.http) = {
+            delete: "/v1/user/{userID}"
+        };
+    }
+
+    // 获取用户列表
+    rpc GetUserList (GetUserListRequest) returns (GetUserListReply) {
+        option (google.api.http) = {
+            get: "/v1/user/list"
+        };
+    }
+
+    // Logout RPC 已被移除，因为在无状态JWT中通常是客户端行为
+}
+
+message UserInfo {
+    int64 userID = 1;
+    string username = 2;
+    string email = 3;
+    string role = 4;
+    string createdAt = 5;
+    string updatedAt = 6;
+}
+
+message RegisterRequest {
+    string username = 1 [(validate.rules).string = {min_len: 2, max_len: 32}];
+    string password = 2 [(validate.rules).string = {min_len: 8, max_len: 32}];
+    string email = 3 [(validate.rules).string.email = true]; // 修复：使用 email 验证
+    string role = 4 [(validate.rules).string = {in: ["customer", "merchant", "reviewer"]}]; // 修复：添加 role 字段
+}
+
+message RegisterReply {
+    bool success = 1; // 优化：添加 success 字段
+    string message = 2;
+}
+
+message LoginRequest {
+    string username = 1 [(validate.rules).string = {min_len: 2, max_len: 32}];
+    string password = 2 [(validate.rules).string = {min_len: 8, max_len: 32}];
+}
+
+message LoginReply {
+    string token = 1;
+    string message = 2;
+}
+
+message GetUserInfoRequest {
+    int64 userID = 1 [(validate.rules).int64 = {gt: 0}];
+}
+
+message GetUserInfoReply {
+    UserInfo userInfo = 1;
+    string message = 2;
+}
+
+message UpdateUserInfoRequest {
+    int64 userID = 1 [(validate.rules).int64 = {gt: 0}];
+    string username = 2 [(validate.rules).string = {min_len: 2, max_len: 32}];
+    string email = 3 [(validate.rules).string.email = true]; // 修复：使用 email 验证
+}
+
+message UpdateUserInfoReply {
+    bool success = 1;
+    string message = 2;
+}
+
+message DeleteUserRequest {
+    int64 userID = 1 [(validate.rules).int64 = {gt: 0}];
+}
+
+message DeleteUserReply {
+    bool success = 1;
+    string message = 2;
+}
+
+message GetUserListRequest { // 修复：补全消息定义
+    int32 offset = 1 [(validate.rules).int32 = {gte: 0}];
+    int32 limit = 2 [(validate.rules).int32 = {gt: 0, lte: 100}];
+}
+
+message GetUserListReply { // 修复：补全消息定义
+    repeated UserInfo users = 1;
+    int64 total = 2;
+}
+
+
